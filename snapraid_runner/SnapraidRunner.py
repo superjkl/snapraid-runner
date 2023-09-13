@@ -138,20 +138,7 @@ def send_notification(success):
     else:
         body = "Error during SnapRAID job:\n\n\n"
 
-    log = email_log.getvalue()
-    maxsize = config['email'].get('maxsize', 500) * 1024
-    if maxsize and len(log) > maxsize:
-        cut_lines = log.count("\n", maxsize // 2, -maxsize // 2)
-        log = (
-            "NOTE: Log was too big for email and was shortened\n\n" +
-            log[:maxsize // 2] +
-            "[...]\n\n\n --- LOG WAS TOO BIG - {} LINES REMOVED --\n\n\n[...]".format(
-                cut_lines) +
-            log[-maxsize // 2:])
-    body += log
-
-    title = config["email"]["subject"] + \
-        (" SUCCESS" if success else " ERROR")
+    title = "SUCCESS" if success else "ERROR"
 
     apobj.notify(body=body, title=title)
 
