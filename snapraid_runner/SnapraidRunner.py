@@ -128,7 +128,7 @@ def send_notification(success):
             logging.error('\'%s\' is an invalid AppRise URL.' % (url))
 
     if len(config["notifications"]["services"]) == 0:
-        logging.error("Failed to send email because no notification services are set")
+        logging.error("Failed to send notification because no notification services are set")
         return
 
     # use quoted-printable instead of the default base64
@@ -138,17 +138,18 @@ def send_notification(success):
     else:
         body = "Error during SnapRAID job:\n\n\n"
 
-    log = email_log.getvalue()
-    maxsize = config['email'].get('maxsize', 500) * 1024
-    if maxsize and len(log) > maxsize:
-        cut_lines = log.count("\n", maxsize // 2, -maxsize // 2)
-        log = (
-            "NOTE: Log was too big for email and was shortened\n\n" +
-            log[:maxsize // 2] +
-            "[...]\n\n\n --- LOG WAS TOO BIG - {} LINES REMOVED --\n\n\n[...]".format(
-                cut_lines) +
-            log[-maxsize // 2:])
-    body += log
+    if email_log is not None:
+        log = email_log.getvalue()
+        maxsize = config['email'].get('maxsize', 500) * 1024
+        if maxsize and len(log) > maxsize:
+            cut_lines = log.count("\n", maxsize // 2, -maxsize // 2)
+            log = (
+                "NOTE: Log was too big for email and was shortened\n\n" +
+                log[:maxsize // 2] +
+                "[...]\n\n\n --- LOG WAS TOO BIG - {} LINES REMOVED --\n\n\n[...]".format(
+                    cut_lines) +
+                log[-maxsize // 2:])
+        body += log
 
     title = config["email"]["subject"] + \
         (" SUCCESS" if success else " ERROR")
